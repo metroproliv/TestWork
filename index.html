@@ -1,20 +1,52 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой лендинг</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <header>
-        <h1>Добро пожаловать!</h1>
-    </header>
-    <main>
-        <section>
-            <h2>О проекте</h2>
-            <p>Описание вашего проекта...</p>
-        </section>
-    </main>
-</body>
-</html>
+---
+title: Архитектура LMS-платформы
+---
+
+<link rel="stylesheet" href="css/style.css" />
+
+# LMS Platform Architecture
+
+![Схема платформы](./_assets/lms_scheme.png)
+
+## Клиентский уровень
+
+| Устройство | Технология | Язык |
+|-----------|------------|------|
+| Desktop / Browser | Quasar Framework | TypeScript |
+| Android | Native | Kotlin |
+| iOS | Native | Swift |
+
+## Серверный уровень
+
+- **LMS Backend API** – Laravel (PHP)  
+- **Firebase Cloud Messaging** – push-уведомления  
+- **Amazon RDS MySQL** – основная БД  
+- **Amazon DynamoDB** – кэш  
+- **Amazon S3** – файловое хранилище  
+
+## Мониторинг и аналитика
+
+| Сервис | Назначение |
+|--------|------------|
+| Firebase & Google Analytics | продуктовая аналитика |
+| BigQuery | ad-hoc SQL-аналитика |
+| Amazon CloudWatch | инфраструктурные метрики |
+| Sentry | error-tracking |
+| Grafana | дашборды |
+| Slack | уведомления |
+
+### Потоки данных
+
+1. **Аутентификация:** клиент → API → MySQL  
+2. **Контент:** клиент → API → S3  
+3. **Кэш:** API ↔ DynamoDB  
+4. **Push:** API → FCM → клиенты  
+
+### Преимущества
+
+- Масштабируемость AWS  
+- Низкая латентность благодаря DynamoDB и CDN S3  
+- Полный стек мониторинга (CloudWatch + Grafana + Sentry)  
+
+> Документация обновляется автоматически при пуше в `main`.
+
