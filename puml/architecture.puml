@@ -42,7 +42,7 @@ devices -down-> api
 devices -down-> fcm
 
 frontend -right-> api : REST/HTTPS
-api -right-> rds : SQL
+api -right-> rds : SQLфиксы
 api -right-> ddb : Cache
 api -right-> s3 : Files
 api -down-> fcm : Push

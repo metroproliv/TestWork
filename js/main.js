@@ -32,13 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const headings = Array.from(document.querySelectorAll('main h2, main h3'))
     const nav = document.createElement('nav')
     const list = document.createElement('ul')
-    list.style.listStyle = 'none'
-    list.style.paddingLeft = '0'
     headings.forEach(h => {
       const id = h.id || h.textContent.trim().toLowerCase().replace(/[^a-zа-я0-9]+/gi,'-')
       h.id = id
       const li = document.createElement('li')
-      li.style.margin = h.tagName === 'H2' ? '8px 0' : '4px 0 4px 12px'
+      if (h.tagName === 'H3') {
+        li.style.paddingLeft = '12px'
+        li.style.fontSize = '14px'
+      }
       const a = document.createElement('a')
       a.href = `#${id}`
       a.textContent = h.textContent
@@ -51,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
     toc.appendChild(title)
     nav.appendChild(list)
     toc.appendChild(nav)
-    toc.style.display = 'block'
   }
 })
 

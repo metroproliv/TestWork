@@ -22,7 +22,8 @@
         nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
         nav .brand{display:flex;align-items:center;gap:10px;font-weight:700}
         nav a{color:var(--fg);text-decoration:none}
-        .layout{display:grid;gap:16px;grid-template-columns:1fr}
+        .layout{display:grid;gap:16px;grid-template-columns:240px 1fr}
+        @media (max-width:900px){.layout{grid-template-columns:1fr}}
         .hero{padding:48px 0}
         .hero h1{font-size:36px;margin:0 0 8px}
         .hero p{color:var(--muted);margin:0}
@@ -39,7 +40,8 @@
         pre code{display:block;max-width:100%}
         pre{overflow:auto;border-radius:12px}
         .badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;padding:2px 10px;border-radius:999px;font-size:12px}
-        .diagram{min-height:220px;display:flex;align-items:center;justify-content:center}
+        .diagram{min-height:500px;display:flex;align-items:center;justify-content:center}
+        .diagram .mermaid{width:100%;height:auto;min-height:400px}
         .codegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
         @media (max-width:1200px){.codegrid{grid-template-columns:1fr}}
         pre{margin:0}
@@ -58,22 +60,12 @@
       <div class="container">
         <nav>
           <a class="brand" href="#"><span style="font-size:22px">📚</span> LMS Platform Architecture</a>
-          <ul>
-            <li><a href="#diagram">Диаграмма</a></li>
-            <li><a href="#overview">Обзор</a></li>
-            <li><a href="#client">Клиент</a></li>
-            <li><a href="#server">Сервер</a></li>
-            <li><a href="#data">Данные</a></li>
-            <li><a href="#monitoring">Мониторинг</a></li>
-            <li><a href="#stack">Технологии</a></li>
-            <li><a href="#flows">Потоки</a></li>
-          </ul>
         </nav>
       </div>
     </header>
 
     <main class="container layout">
-      <aside class="panel" id="toc" style="display:none"></aside>
+      <aside class="panel" id="toc"></aside>
       <section class="hero panel">
         <span class="badge">AWS · Firebase · Laravel · Quasar</span>
         <h1>Архитектура LMS‑платформы</h1>
@@ -145,6 +137,23 @@
     class LMSDB,Cache,Storage database
     class Analytics,BigQuery,Grafana,CloudWatch,Sentry,Slack monitoring</pre>
         </div>
+      </section>
+
+      <section id="flows" class="panel">
+        <h2>Потоки данных</h2>
+        <h3>Основные пользовательские сценарии</h3>
+        <ol>
+          <li><strong>Аутентификация пользователя</strong>: Клиент → LMS Backend API → LMS Database</li>
+          <li><strong>Загрузка образовательного контента</strong>: Клиент → LMS Backend API → Amazon S3</li>
+          <li><strong>Кэширование данных</strong>: LMS Backend API → DynamoDB → Клиент</li>
+          <li><strong>Push‑уведомления</strong>: LMS Backend API → Firebase Cloud Messaging → Клиенты</li>
+        </ol>
+        <h3>Мониторинг и аналитика</h3>
+        <ol>
+          <li><strong>Пользовательские события</strong>: Клиенты → Firebase Analytics → BigQuery</li>
+          <li><strong>Системные метрики</strong>: AWS сервисы → CloudWatch → Grafana</li>
+          <li><strong>Ошибки приложения</strong>: Backend/Frontend → Sentry → Slack</li>
+        </ol>
       </section>
 
       <section id="overview" class="panel">
@@ -250,23 +259,6 @@
             <tr><td>Push уведомления</td><td>Firebase Cloud Messaging</td><td>—</td></tr>
           </tbody>
         </table>
-      </section>
-
-      <section id="flows" class="panel">
-        <h2>Потоки данных</h2>
-        <h3>Основные пользовательские сценарии</h3>
-        <ol>
-          <li><strong>Аутентификация пользователя</strong>: Клиент → LMS Backend API → LMS Database</li>
-          <li><strong>Загрузка образовательного контента</strong>: Клиент → LMS Backend API → Amazon S3</li>
-          <li><strong>Кэширование данных</strong>: LMS Backend API → DynamoDB → Клиент</li>
-          <li><strong>Push‑уведомления</strong>: LMS Backend API → Firebase Cloud Messaging → Клиенты</li>
-        </ol>
-        <h3>Мониторинг и аналитика</h3>
-        <ol>
-          <li><strong>Пользовательские события</strong>: Клиенты → Firebase Analytics → BigQuery</li>
-          <li><strong>Системные метрики</strong>: AWS сервисы → CloudWatch → Grafana</li>
-          <li><strong>Ошибки приложения</strong>: Backend/Frontend → Sentry → Slack</li>
-        </ol>
       </section>
 
       <footer>
