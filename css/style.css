@@ -1,13 +1,18 @@
 /* Дополнительные стили для улучшения читаемости */
 :root{scroll-behavior:smooth}
+/* Правильное позиционирование якорей */
+section[id] {
+  scroll-margin-top: 100px;
+}
 main .muted{color:var(--muted)}
 article h3{margin-top:0}
 .panel ul{margin:0 0 0 1rem}
 .panel li{margin:4px 0}
 /* Левое дерево разделов */
-#toc{position:sticky;top:72px;max-height:calc(100vh - 120px);overflow-y:auto}
-#toc nav a{color:var(--fg);text-decoration:none;display:block;padding:4px 0;font-size:14px}
-#toc nav a:hover{text-decoration:underline;color:var(--accent)}
+#toc{position:sticky;top:72px;max-height:calc(100vh - 120px);overflow-y:auto;transition:all 0.3s ease}
+#toc nav a{color:var(--fg);text-decoration:none;display:block;padding:4px 0;font-size:14px;transition:all 0.2s ease;border-radius:4px}
+#toc nav a:hover{text-decoration:underline;color:var(--accent);background:rgba(124,58,237,0.1);padding-left:8px}
+#toc nav a.active{color:var(--accent);background:rgba(124,58,237,0.15);padding-left:8px;font-weight:600}
 #toc h2{margin:0 0 12px;font-size:16px}
 #toc ul{margin:0;padding:0;list-style:none}
 #toc li{margin:2px 0}
