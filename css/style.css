@@ -6,9 +6,9 @@ article h3{margin-top:0}
 .panel li{margin:4px 0}
 /* Левое дерево разделов */
 #toc{position:sticky;top:72px;max-height:calc(100vh - 120px);overflow-y:auto}
-#toc nav a{color:var(--fg);text-decoration:none;display:block;padding:4px 0}
+#toc nav a{color:var(--fg);text-decoration:none;display:block;padding:4px 0;font-size:14px}
 #toc nav a:hover{text-decoration:underline;color:var(--accent)}
 #toc h2{margin:0 0 12px;font-size:16px}
-#toc ul{margin:0;padding:0}
+#toc ul{margin:0;padding:0;list-style:none}
 #toc li{margin:2px 0}
 
