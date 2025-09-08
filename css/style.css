@@ -1,0 +1,7 @@
+/* Дополнительные стили для улучшения читаемости */
+:root{scroll-behavior:smooth}
+main .muted{color:var(--muted)}
+article h3{margin-top:0}
+.panel ul{margin:0 0 0 1rem}
+.panel li{margin:4px 0}
+

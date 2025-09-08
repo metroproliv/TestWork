@@ -1,52 +1,198 @@
----
-title: Архитектура LMS-платформы
----
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LMS Platform Architecture</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <script defer src="/js/main.js"></script>
+    <meta name="description" content="Архитектурное описание LMS-платформы: компоненты, потоки данных, мониторинг и диаграмма PlantUML.">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📚</text></svg>">
+    <style>
+        /* Короткий критический стиль (остальное в css/style.css) */
+        body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
+        :root{--bg:#0b1020;--panel:#0f162e;--fg:#eef2ff;--muted:#94a3b8;--accent:#7c3aed;--accent-2:#22d3ee}
+        @media (prefers-color-scheme: light){:root{--bg:#ffffff;--panel:#f6f7fb;--fg:#0b1020;--muted:#475569;--accent:#6d28d9;--accent-2:#0891b2}}
+        .container{max-width:1100px;margin:0 auto;padding:24px}
+        header{position:sticky;top:0;background:rgba(15,22,46,.6);backdrop-filter:blur(8px);border-bottom:1px solid rgba(124,58,237,.25);z-index:10}
+        nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
+        nav .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+        nav a{color:var(--fg);text-decoration:none}
+        .grid{display:grid;gap:16px}
+        .hero{padding:48px 0}
+        .hero h1{font-size:36px;margin:0 0 8px}
+        .hero p{color:var(--muted);margin:0}
+        .panel{background:var(--panel);border:1px solid rgba(124,58,237,.25);border-radius:16px;padding:20px}
+        h2{margin:0 0 12px}
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        @media (max-width:900px){.two-col{grid-template-columns:1fr}}
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:10px;border-bottom:1px dashed rgba(124,58,237,.25);text-align:left}
+        code{background:rgba(124,58,237,.12);padding:2px 6px;border-radius:6px}
+        footer{color:var(--muted);padding:24px 0}
+        .badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;padding:2px 10px;border-radius:999px;font-size:12px}
+        .diagram{min-height:220px;display:flex;align-items:center;justify-content:center}
+        .codegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+        @media (max-width:900px){.codegrid{grid-template-columns:1fr}}
+        pre{margin:0}
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1/themes/prism-one-dark.css">
+    <script>Prism.plugins.autoloader.languages_path='https://cdn.jsdelivr.net/npm/prismjs@1/components/';</script>
+    <meta name="robots" content="index,follow">
+    <meta name="theme-color" content="#7c3aed">
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <a class="brand" href="#"><span style="font-size:22px">📚</span> LMS Platform Architecture</a>
+          <ul>
+            <li><a href="#diagram">Диаграмма</a></li>
+            <li><a href="#components">Компоненты</a></li>
+            <li><a href="#flows">Потоки</a></li>
+            <li><a href="#code">Код</a></li>
+            <li><a target="_blank" href="/puml/architecture.puml">PlantUML</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
 
-<link rel="stylesheet" href="css/style.css" />
+    <main class="container grid">
+      <section class="hero panel">
+        <span class="badge">AWS · Firebase · Laravel · Quasar</span>
+        <h1>Архитектура LMS‑платформы</h1>
+        <p>Кроссплатформенный фронтенд (Web, Android, iOS), Laravel‑бэкенд, хранилище на AWS, FCM, и стек мониторинга с Sentry, CloudWatch, Grafana.</p>
+      </section>
 
-# LMS Platform Architecture
+      <section id="diagram" class="panel">
+        <h2>Схема (PlantUML)</h2>
+        <p class="muted">Файл рендерится в браузере через Kroki. Источник: <code>puml/architecture.puml</code>.</p>
+        <div id="diagram-container" class="diagram">Загрузка диаграммы…</div>
+      </section>
 
-![Схема платформы](./_assets/lms_scheme.png)
+      <section id="components" class="two-col">
+        <div class="panel">
+          <h2>Клиентский уровень</h2>
+          <table>
+            <thead>
+              <tr><th>Устройство</th><th>Фреймворк</th><th>Язык</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Desktop / Browser</td><td>Quasar Framework</td><td>TypeScript</td></tr>
+              <tr><td>Android</td><td>Native</td><td>Kotlin</td></tr>
+              <tr><td>iOS</td><td>Native</td><td>Swift</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Серверный уровень</h2>
+          <ul>
+            <li><strong>LMS Backend API</strong> — Laravel (PHP)</li>
+            <li><strong>Amazon RDS MySQL</strong> — основная БД</li>
+            <li><strong>Amazon DynamoDB</strong> — кэш и сессии</li>
+            <li><strong>Amazon S3</strong> — файловое хранилище</li>
+            <li><strong>Firebase Cloud Messaging</strong> — push‑уведомления</li>
+          </ul>
+        </div>
+      </section>
 
-## Клиентский уровень
+      <section class="two-col" id="flows">
+        <div class="panel">
+          <h2>Мониторинг и аналитика</h2>
+          <ul>
+            <li>Firebase & Google Analytics — продуктовая аналитика, перформанс</li>
+            <li>BigQuery — ad‑hoc SQL‑анализ</li>
+            <li>Amazon CloudWatch — инфраструктура и логи</li>
+            <li>Sentry — error tracking</li>
+            <li>Grafana — дашборды</li>
+            <li>Slack — уведомления</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h2>Основные потоки данных</h2>
+          <ol>
+            <li><strong>Аутентификация</strong>: Клиент → API → MySQL</li>
+            <li><strong>Контент</strong>: Клиент → API → S3</li>
+            <li><strong>Кэш</strong>: API ↔ DynamoDB</li>
+            <li><strong>Push</strong>: API → FCM → клиенты</li>
+            <li><strong>Мониторинг</strong>: API/Клиенты → Sentry/CloudWatch → Grafana → Slack</li>
+          </ol>
+        </div>
+      </section>
 
-| Устройство | Технология | Язык |
-|-----------|------------|------|
-| Desktop / Browser | Quasar Framework | TypeScript |
-| Android | Native | Kotlin |
-| iOS | Native | Swift |
+      <section id="code" class="panel">
+        <h2>Примеры кода</h2>
+        <div class="codegrid">
+          <article>
+            <h3>TypeScript · Quasar</h3>
+            <pre><code class="language-ts">import { api } from 'boot/axios'
 
-## Серверный уровень
+async function fetchCourses(): Promise&lt;Array&lt;{ id: number; title: string }&gt;&gt; {
+  const { data } = await api.get('/courses')
+  return data
+}
 
-- **LMS Backend API** – Laravel (PHP)  
-- **Firebase Cloud Messaging** – push-уведомления  
-- **Amazon RDS MySQL** – основная БД  
-- **Amazon DynamoDB** – кэш  
-- **Amazon S3** – файловое хранилище  
+export async function sendPushToken(token: string): Promise&lt;void&gt; {
+  await api.post('/devices', { token })
+}</code></pre>
+          </article>
 
-## Мониторинг и аналитика
+          <article>
+            <h3>PHP · Laravel API</h3>
+            <pre><code class="language-php">&lt;?php
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
-| Сервис | Назначение |
-|--------|------------|
-| Firebase & Google Analytics | продуктовая аналитика |
-| BigQuery | ad-hoc SQL-аналитика |
-| Amazon CloudWatch | инфраструктурные метрики |
-| Sentry | error-tracking |
-| Grafana | дашборды |
-| Slack | уведомления |
+Route::get('/courses', function () {
+    return Cache::remember('courses', 60, fn() => Course::query()
+        ->select(['id','title'])
+        ->orderBy('title')
+        ->get());
+});
 
-### Потоки данных
+Route::post('/devices', function (Request $request) {
+    // Сохранить FCM‑токен устройства
+    Device::updateOrCreate(
+        ['token' => $request->string('token')],
+        ['platform' => $request->string('platform', 'web')]
+    );
+    return response()->noContent();
+});</code></pre>
+          </article>
 
-1. **Аутентификация:** клиент → API → MySQL  
-2. **Контент:** клиент → API → S3  
-3. **Кэш:** API ↔ DynamoDB  
-4. **Push:** API → FCM → клиенты  
+          <article>
+            <h3>Swift · iOS</h3>
+            <pre><code class="language-swift">import UserNotifications
 
-### Преимущества
+func registerForPush(_ application: UIApplication) {
+  UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
+    if granted { DispatchQueue.main.async { application.registerForRemoteNotifications() } }
+  }
+}</code></pre>
+          </article>
 
-- Масштабируемость AWS  
-- Низкая латентность благодаря DynamoDB и CDN S3  
-- Полный стек мониторинга (CloudWatch + Grafana + Sentry)  
+          <article>
+            <h3>Kotlin · Android</h3>
+            <pre><code class="language-kotlin">class MyFirebaseService : FirebaseMessagingService() {
+  override fun onNewToken(token: String) {
+    // Отправка токена в API
+    Api.post("/devices", mapOf("token" to token))
+  }
+}</code></pre>
+          </article>
+        </div>
+      </section>
 
-> Документация обновляется автоматически при пуше в `main`.
-
+      <footer>
+        <p>© 2025 LMS Platform. Диаграмма рендерится с помощью Kroki/PlantUML. Исходники доступны в репозитории.</p>
+      </footer>
+    </main>
+  </body>
+</html>
