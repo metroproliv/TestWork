@@ -4,4 +4,8 @@ main .muted{color:var(--muted)}
 article h3{margin-top:0}
 .panel ul{margin:0 0 0 1rem}
 .panel li{margin:4px 0}
+/* Левое дерево разделов */
+#toc{position:sticky;top:72px;max-height:calc(100vh - 120px)}
+#toc nav a{color:var(--fg);text-decoration:none}
+#toc nav a:hover{text-decoration:underline}
 
