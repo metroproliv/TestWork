@@ -31,8 +31,6 @@
         .hero p{color:var(--muted);margin:0}
         .panel{background:var(--panel);border:1px solid rgba(124,58,237,.25);border-radius:16px;padding:20px}
         h2{margin:0 0 12px}
-        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-        @media (max-width:1200px){.two-col{grid-template-columns:1fr}}
         table{width:100%;border-collapse:collapse}
         th,td{padding:10px;border-bottom:1px dashed rgba(124,58,237,.25);text-align:left}
         code{background:rgba(124,58,237,.12);padding:2px 6px;border-radius:6px}
@@ -44,8 +42,6 @@
         .badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;padding:2px 10px;border-radius:999px;font-size:12px}
         .diagram{min-height:500px;display:flex;align-items:center;justify-content:center}
         .diagram .mermaid{width:100%;height:auto;min-height:400px}
-        .codegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-        @media (max-width:1200px){.codegrid{grid-template-columns:1fr}}
         pre{margin:0}
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
@@ -186,79 +182,77 @@
         </ul>
       </section>
 
-      <section id="components" class="two-col">
-        <div class="panel">
-          <h2 id="client">Клиентский уровень (Presentation Layer)</h2>
-          <h3>Пользовательские устройства</h3>
-          <p>Платформа поддерживает четыре основных типа клиентских устройств:</p>
-          <table>
-            <thead>
-              <tr><th>Устройство</th><th>Фреймворк</th><th>Язык</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Desktop / Browser</td><td>Quasar Framework</td><td>TypeScript</td></tr>
-              <tr><td>Android</td><td>Native</td><td>Kotlin</td></tr>
-              <tr><td>iOS</td><td>Native</td><td>Swift</td></tr>
-            </tbody>
-          </table>
-          <h3>Frontend архитектура</h3>
-          <ul>
-            <li>Единая кодовая база для веб и мобильных приложений</li>
-            <li>Типобезопасность и улучшенная поддержка разработки</li>
-            <li>Компонентно‑ориентированная архитектура</li>
-            <li>Адаптивный дизайн для различных устройств</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h2 id="server">Серверный уровень (Application Layer)</h2>
-          <h3>Backend API</h3>
-          <ul>
-            <li>RESTful API для взаимодействия с клиентскими приложениями</li>
-            <li>Аутентификация и авторизация пользователей</li>
-            <li>Бизнес‑логика управления образовательным процессом</li>
-            <li>Интеграции с внешними сервисами</li>
-          </ul>
-          <h3>Система уведомлений</h3>
-          <ul>
-            <li>Кроссплатформенные push‑уведомления</li>
-            <li>Мгновенная доставка сообщений</li>
-            <li>Персонализация уведомлений по событиям</li>
-          </ul>
-        </div>
+      <section id="client" class="panel">
+        <h2>Клиентский уровень (Presentation Layer)</h2>
+        <h3>Пользовательские устройства</h3>
+        <p>Платформа поддерживает четыре основных типа клиентских устройств:</p>
+        <table>
+          <thead>
+            <tr><th>Устройство</th><th>Фреймворк</th><th>Язык</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Desktop / Browser</td><td>Quasar Framework</td><td>TypeScript</td></tr>
+            <tr><td>Android</td><td>Native</td><td>Kotlin</td></tr>
+            <tr><td>iOS</td><td>Native</td><td>Swift</td></tr>
+          </tbody>
+        </table>
+        <h3>Frontend архитектура</h3>
+        <ul>
+          <li>Единая кодовая база для веб и мобильных приложений</li>
+          <li>Типобезопасность и улучшенная поддержка разработки</li>
+          <li>Компонентно‑ориентированная архитектура</li>
+          <li>Адаптивный дизайн для различных устройств</li>
+        </ul>
       </section>
 
-      <section class="two-col" id="data">
-        <div class="panel">
-          <h2>Уровень данных (Data Layer)</h2>
-          <h3>Основная база данных</h3>
-          <ul>
-            <li>Amazon RDS MySQL — реляционная модель, резервное копирование</li>
-            <li>Масштабирование через read replicas, высокая доступность</li>
-          </ul>
-          <h3>Система кэширования</h3>
-          <ul>
-            <li>Amazon DynamoDB — быстрый доступ, авто‑масштабирование</li>
-          </ul>
-          <h3>Файловое хранилище</h3>
-          <ul>
-            <li>Amazon S3 — контент, CDN, версионирование, права доступа</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h2 id="monitoring">Система мониторинга и аналитики</h2>
-          <h3>Аналитика пользовательского поведения</h3>
-          <p>Firebase и Google Analytics — трекинг, аналитика обучения, вовлеченность.</p>
-          <h3>Big Data аналитика</h3>
-          <p>BigQuery — складирование данных и SQL‑анализ.</p>
-          <h3>Визуализация метрик</h3>
-          <p>Grafana — дашборды и алерты.</p>
-          <h3>Инфраструктурный мониторинг</h3>
-          <p>Amazon CloudWatch — метрики и логи, уведомления.</p>
-          <h3>Error tracking</h3>
-          <p>Sentry — ошибки в реальном времени с подробными стеками.</p>
-          <h3>Система уведомлений</h3>
-          <p>Slack — централизованные уведомления и интеграции.</p>
-        </div>
+      <section id="server" class="panel">
+        <h2>Серверный уровень (Application Layer)</h2>
+        <h3>Backend API</h3>
+        <ul>
+          <li>RESTful API для взаимодействия с клиентскими приложениями</li>
+          <li>Аутентификация и авторизация пользователей</li>
+          <li>Бизнес‑логика управления образовательным процессом</li>
+          <li>Интеграции с внешними сервисами</li>
+        </ul>
+        <h3>Система уведомлений</h3>
+        <ul>
+          <li>Кроссплатформенные push‑уведомления</li>
+          <li>Мгновенная доставка сообщений</li>
+          <li>Персонализация уведомлений по событиям</li>
+        </ul>
+      </section>
+
+      <section id="data" class="panel">
+        <h2>Уровень данных (Data Layer)</h2>
+        <h3>Основная база данных</h3>
+        <ul>
+          <li>Amazon RDS MySQL — реляционная модель, резервное копирование</li>
+          <li>Масштабирование через read replicas, высокая доступность</li>
+        </ul>
+        <h3>Система кэширования</h3>
+        <ul>
+          <li>Amazon DynamoDB — быстрый доступ, авто‑масштабирование</li>
+        </ul>
+        <h3>Файловое хранилище</h3>
+        <ul>
+          <li>Amazon S3 — контент, CDN, версионирование, права доступа</li>
+        </ul>
+      </section>
+
+      <section id="monitoring" class="panel">
+        <h2>Система мониторинга и аналитики</h2>
+        <h3>Аналитика пользовательского поведения</h3>
+        <p>Firebase и Google Analytics — трекинг, аналитика обучения, вовлеченность.</p>
+        <h3>Big Data аналитика</h3>
+        <p>BigQuery — складирование данных и SQL‑анализ.</p>
+        <h3>Визуализация метрик</h3>
+        <p>Grafana — дашборды и алерты.</p>
+        <h3>Инфраструктурный мониторинг</h3>
+        <p>Amazon CloudWatch — метрики и логи, уведомления.</p>
+        <h3>Error tracking</h3>
+        <p>Sentry — ошибки в реальном времени с подробными стеками.</p>
+        <h3>Система уведомлений</h3>
+        <p>Slack — централизованные уведомления и интеграции.</p>
       </section>
 
       <section id="stack" class="panel">
