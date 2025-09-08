@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Генерируем дерево разделов слева
   const toc = document.getElementById('toc')
   if (toc) {
-    const headings = Array.from(document.querySelectorAll('main h2, main h3'))
+    const headings = Array.from(document.querySelectorAll('.content h2, .content h3'))
     const nav = document.createElement('nav')
     const list = document.createElement('ul')
     headings.forEach(h => {

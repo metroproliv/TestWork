@@ -24,6 +24,8 @@
         nav a{color:var(--fg);text-decoration:none}
         .layout{display:grid;gap:16px;grid-template-columns:240px 1fr}
         @media (max-width:900px){.layout{grid-template-columns:1fr}}
+        .content{grid-column:2}
+        @media (max-width:900px){.content{grid-column:1}}
         .hero{padding:48px 0}
         .hero h1{font-size:36px;margin:0 0 8px}
         .hero p{color:var(--muted);margin:0}
@@ -66,6 +68,7 @@
 
     <main class="container layout">
       <aside class="panel" id="toc"></aside>
+      <div class="content">
       <section class="hero panel">
         <span class="badge">AWS · Firebase · Laravel · Quasar</span>
         <h1>Архитектура LMS‑платформы</h1>
@@ -264,6 +267,7 @@
       <footer>
         <p>© 2025 LMS Platform. Диаграмма: Mermaid. Исходники доступны в репозитории.</p>
       </footer>
+      </div>
     </main>
   </body>
 </html>
