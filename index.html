@@ -18,7 +18,7 @@
         :root{--bg:#0b1020;--panel:#0f162e;--fg:#eef2ff;--muted:#94a3b8;--accent:#7c3aed;--accent-2:#22d3ee}
         @media (prefers-color-scheme: light){:root{--bg:#ffffff;--panel:#f6f7fb;--fg:#0b1020;--muted:#475569;--accent:#6d28d9;--accent-2:#0891b2}}
         .container{max-width:1100px;margin:0 auto;padding:24px}
-        header{position:sticky;top:0;background:rgba(15,22,46,.6);backdrop-filter:blur(8px);border-bottom:1px solid rgba(124,58,237,.25);z-index:10}
+        header{position:sticky;top:0;background:var(--panel);border-bottom:1px solid rgba(124,58,237,.25);z-index:10}
         nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
         nav .brand{display:flex;align-items:center;gap:10px;font-weight:700}
         nav a{color:var(--fg);text-decoration:none}
@@ -67,8 +67,8 @@
         <h2>Разделы</h2>
         <nav id="toc-nav">
           <ul>
-            <li><a href="#diagram">Диаграмма</a></li>
             <li><a href="#overview">Архитектурная документация</a></li>
+            <li><a href="#diagram">Диаграмма</a></li>
             <li><a href="#flows">Потоки данных</a></li>
             <li><a href="#client">Клиентский уровень</a></li>
             <li><a href="#server">Серверный уровень</a></li>

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     sections.forEach(section => {
       const headerHeight = 80
-      const sectionTop = section.offsetTop - headerHeight - 20
+      const sectionTop = section.offsetTop - headerHeight
       const sectionHeight = section.offsetHeight
       
       if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (targetSection) {
         const headerHeight = 80 // высота хедера
-        const offsetTop = targetSection.offsetTop - headerHeight - 20 // дополнительный отступ
+        const offsetTop = targetSection.offsetTop - headerHeight
         window.scrollTo({
           top: offsetTop,
           behavior: 'smooth'
