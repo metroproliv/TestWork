@@ -4,51 +4,334 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LMS Platform Architecture</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
-    <script defer src="/js/main.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script defer src="js/main.js"></script>
     <meta name="description" content="Архитектурное описание LMS-платформы: компоненты, потоки данных, мониторинг и диаграмма PlantUML.">
     <meta name="color-scheme" content="light dark">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📚</text></svg>">
     <style>
-        /* Короткий критический стиль (остальное в css/style.css) */
-        body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
-        :root{--bg:#0b1020;--panel:#0f162e;--fg:#eef2ff;--muted:#94a3b8;--accent:#7c3aed;--accent-2:#22d3ee}
-        @media (prefers-color-scheme: light){:root{--bg:#ffffff;--panel:#f6f7fb;--fg:#0b1020;--muted:#475569;--accent:#6d28d9;--accent-2:#0891b2}}
-        .container{max-width:1100px;margin:0 auto;padding:24px}
-        header{position:sticky;top:0;background:var(--panel);border-bottom:1px solid rgba(124,58,237,.25);z-index:10}
-        nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
-        nav .brand{display:flex;align-items:center;gap:10px;font-weight:700}
-        nav a{color:var(--fg);text-decoration:none}
-        .layout{display:grid;gap:16px;grid-template-columns:240px 1fr}
-        @media (max-width:900px){.layout{grid-template-columns:1fr}}
-        .content{grid-column:2}
-        @media (max-width:900px){.content{grid-column:1}}
-        .hero{padding:48px 0}
-        .hero h1{font-size:36px;margin:0 0 8px}
-        .hero p{color:var(--muted);margin:0}
-        .panel{background:var(--panel);border:1px solid rgba(124,58,237,.25);border-radius:16px;padding:20px}
-        h2{margin:0 0 12px}
-        table{width:100%;border-collapse:collapse}
-        th,td{padding:10px;border-bottom:1px dashed rgba(124,58,237,.25);text-align:left}
-        code{background:rgba(124,58,237,.12);padding:2px 6px;border-radius:6px}
-        footer{color:var(--muted);padding:24px 0}
-        /* предотвращаем перекрытие код-блоками соседних секций */
-        .panel{overflow:hidden}
-        pre code{display:block;max-width:100%}
-        pre{overflow:auto;border-radius:12px}
-        .badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;padding:2px 10px;border-radius:999px;font-size:12px}
-        .diagram{min-height:500px;display:flex;align-items:center;justify-content:center}
-        .diagram .mermaid{width:100%;height:auto;min-height:400px}
-        pre{margin:0}
+        /* Confluence-style design */
+        :root {
+            --primary-blue: #0052cc;
+            --primary-blue-hover: #0065ff;
+            --background: #ffffff;
+            --surface: #f4f5f7;
+            --border: #dfe1e6;
+            --border-light: #f4f5f7;
+            --text-primary: #172b4d;
+            --text-secondary: #5e6c84;
+            --text-muted: #97a0af;
+            --accent: #0052cc;
+            --accent-light: #deebff;
+            --success: #00875a;
+            --warning: #ff991f;
+            --error: #de350b;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            --shadow-hover: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+        }
+
+        nav .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        nav .brand:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            padding: 24px 0;
+        }
+
+        @media (max-width: 1024px) {
+            .layout {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        /* Sidebar */
+        #toc {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            position: sticky;
+            top: 100px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        #toc h2 {
+            margin: 0 0 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        #toc ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #toc li {
+            margin: 2px 0;
+        }
+
+        #toc nav a {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        #toc nav a:hover {
+            background: var(--accent-light);
+            color: var(--primary-blue);
+        }
+
+        #toc nav a.active {
+            background: var(--accent-light);
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        /* Content */
+        .content {
+            min-width: 0;
+        }
+
+        /* Hero section */
+        .hero {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 0 0 12px;
+            color: var(--text-primary);
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel h2 {
+            margin: 0 0 16px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .panel h3 {
+            margin: 24px 0 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .panel p {
+            margin: 0 0 16px;
+            color: var(--text-secondary);
+        }
+
+        .panel ul, .panel ol {
+            margin: 0 0 16px;
+            padding-left: 20px;
+        }
+
+        .panel li {
+            margin: 4px 0;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--surface);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Code */
+        code {
+            background: var(--surface);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            overflow: auto;
+            margin: 16px 0;
+        }
+
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        /* Diagram */
+        .diagram {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .diagram .mermaid {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Footer */
+        footer {
+            color: var(--text-muted);
+            padding: 32px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            margin-top: 48px;
+        }
+
+        /* Scroll behavior */
+        :root {
+            scroll-behavior: smooth;
+        }
+
+        section[id] {
+            scroll-margin-top: 100px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+            
+            .hero {
+                padding: 24px;
+            }
+            
+            .hero h1 {
+                font-size: 24px;
+            }
+            
+            .panel {
+                padding: 20px;
+            }
+        }
     </style>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1/themes/prism-one-dark.css">
-    <script>Prism.plugins.autoloader.languages_path='https://cdn.jsdelivr.net/npm/prismjs@1/components/';</script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <meta name="robots" content="index,follow">
     <meta name="theme-color" content="#7c3aed">
@@ -57,7 +340,7 @@
     <header>
       <div class="container">
         <nav>
-          <a class="brand" href="#"><span style="font-size:22px">📚</span> Тестовое задание LMS Platform Architecture</a>
+          <a class="brand" href="#"><span style="font-size:20px">📚</span> LMS Platform Architecture</a>
         </nav>
       </div>
     </header>
@@ -73,29 +356,22 @@
             <li><a href="#client">Клиентский уровень</a></li>
             <li><a href="#server">Серверный уровень</a></li>
             <li><a href="#data">Уровень данных</a></li>
+            <li><a href="#notifications">Система уведомлений</a></li>
             <li><a href="#monitoring">Система мониторинга</a></li>
             <li><a href="#stack">Технологический стек</a></li>
           </ul>
         </nav>
       </aside>
       <div class="content">
-      <section class="hero panel">
+      <section class="hero">
         <span class="badge">AWS · Firebase · Laravel · Quasar</span>
         <h1>Архитектура LMS‑платформы</h1>
         <p>Кроссплатформенный фронтенд (Web, Android, iOS), Laravel‑бэкенд, хранилище на AWS, FCM, и стек мониторинга с Sentry, CloudWatch, Grafana.</p>
       </section>
 
       <section id="overview" class="panel">
-        <h2>Архитектурная документация LMS платформы</h2>
-        <h3>Обзор архитектуры</h3>
-        <p>LMS (Learning Management System) платформа представляет собой образовательное решение, построенное на микросервисной архитектуре с использованием облачных технологий. Система обеспечивает мультиплатформенный доступ к образовательному контенту через веб‑интерфейс и нативные мобильные приложения.</p>
-        <p><strong>Ключевые архитектурные принципы:</strong></p>
-        <ul>
-          <li>Разделение фронтенда и бэкенда (Frontend/Backend separation)</li>
-          <li>Использование облачных сервисов для масштабируемости</li>
-          <li>Комплексная система мониторинга и аналитики</li>
-          <li>Поддержка реального времени через push‑уведомления</li>
-        </ul>
+        <h2>Архитектура платформы обучения</h2>
+        <p>Платформа обучения построена по трехуровневой архитектуре с разделением на клиентский уровень, серверный уровень и уровень данных. Система поддерживает работу с различными типами клиентских устройств и обеспечивает масштабируемость за счет облачной инфраструктуры.</p>
       </section>
 
       <section id="diagram" class="panel">
@@ -103,171 +379,324 @@
         <p class="muted">Визуализация архитектуры LMS при помощи Mermaid.</p>
         <div class="diagram">
 <pre class="mermaid">flowchart TD
-    subgraph UD["User Devices"]
-        Desktop[Desktop]
-        Browser[Browser]
-        Android[Android]
-        iOS[iOS]
-    end
-    subgraph LMS["LMS Platform"]
-        Frontend["🌀 LMS Frontend<br/>Quasar Framework"]
-        Backend["📦 LMS Backend API<br/>Laravel framework"]
-        Firebase["🔥 Firebase Cloud Messaging"]
-    end
-    subgraph DB["Database Services"]
-        LMSDB["💾 LMS Database<br/>Amazon RDS MySQL"]
-        Cache["💾 Amazon DynamoDB (Cache)"]
-        Storage["☁️ Amazon S3 (Files)"]
-    end
-    subgraph MON["Monitoring"]
-        Analytics["🔥 Firebase + Google Analytics"]
-        BigQuery["🔍 BigQuery"]
-        Grafana["📊 Grafana"]
-        CloudWatch["☁️ CloudWatch"]
-        Sentry["🚨 Sentry"]
-        Slack["💬 Slack"]
-    end
-    Desktop --> Frontend
-    Desktop --> Backend
-    Browser --> Frontend
-    Browser --> Backend
-    Android --> Frontend
-    Android --> Backend
-    Android --> Firebase
-    iOS --> Frontend
-    iOS --> Backend
-    iOS --> Firebase
-    Backend --> LMSDB
-    Backend --> Cache
-    Backend --> Storage
-    Desktop --> Analytics
-    Browser --> Analytics
-    Android --> Analytics
-    iOS --> Analytics
-    Analytics --> BigQuery
-    BigQuery --> Grafana
-    Analytics --> CloudWatch
-    CloudWatch --> Sentry
-    Sentry --> Slack
-    CloudWatch --> Slack
-    Grafana --> Slack
-    Backend --> CloudWatch
-    Frontend --> Analytics
-    Firebase --> Analytics
-    classDef userDevice fill:#e8f4f8
-    classDef lmsPlatform fill:#cce7ff
-    classDef database fill:#e6f3ff
-    classDef monitoring fill:#fff2cc
+  subgraph UserDevices["👥 Пользовательские устройства"]
+      Desktop["🖥️ Desktop<br/>Веб-браузер"]
+      Browser["📱 Mobile Browser<br/>Мобильный браузер"]
+      Android["📱 Android App<br/>Нативное приложение"]
+      iOS["📱 iOS App<br/>Нативное приложение"]
+  end
+
+  subgraph LMSPlatform["🎓 LMS Platform"]
+      direction TB
+      subgraph Frontend["🎨 Презентационный слой"]
+          LMSFrontend["⚡ LMS Frontend<br/>🔧 Quasar Framework<br/>Vue.js SPA"]
+      end
+      
+      subgraph Backend["⚙️ Бизнес-логика"]
+          LMSBackendAPI["🚀 LMS Backend API<br/>🔧 Laravel Framework<br/>REST API"]
+      end
+      
+      subgraph Storage["💾 Слой данных"]
+          LMSDatabase["🗄️ LMS Database<br/>🔧 Amazon RDS<br/>MySQL Community"]
+          LMSDatabaseCache["⚡ Database Cache<br/>🔧 Amazon DynamoDB<br/>NoSQL кеш"]
+          LMSFileStorage["📦 File Storage<br/>🔧 Amazon S3<br/>Объектное хранилище"]
+      end
+      
+      subgraph Messaging["📢 Уведомления"]
+          FirebaseMessaging["🔔 Firebase Cloud Messaging<br/>Push-уведомления"]
+      end
+  end
+
+  subgraph Monitoring["📊 Мониторинг и аналитика"]
+      direction TB
+      subgraph Analytics["📈 Аналитика"]
+          FirebaseGoogleAnalytics["📊 Firebase & Google Analytics<br/>Пользовательская аналитика"]
+          BigQuery["🔍 BigQuery<br/>Data Warehouse"]
+      end
+      
+      subgraph Infrastructure["🔧 Инфраструктурный мониторинг"]
+          AmazonCloudWatch["☁️ Amazon CloudWatch<br/>Метрики AWS"]
+          Sentry["🐛 Sentry<br/>Отслеживание ошибок"]
+      end
+      
+      subgraph Visualization["📊 Визуализация"]
+          Grafana["📊 Grafana<br/>Дашборды"]
+      end
+      
+      subgraph Communication["💬 Коммуникации"]
+          Slack["💬 Slack<br/>Уведомления команды"]
+      end
+  end
+
+  %% Connections with styled arrows
+  Desktop -.->|HTTPS| LMSFrontend
+  Desktop -.->|REST API| LMSBackendAPI
+  Desktop -->|Analytics| FirebaseGoogleAnalytics
+
+  Browser -.->|HTTPS| LMSFrontend
+  Browser -.->|REST API| LMSBackendAPI
+  Browser -->|Analytics| FirebaseGoogleAnalytics
+
+  Android -.->|REST API| LMSBackendAPI
+  Android <-.->|Push| FirebaseMessaging
+  Android -->|Analytics| FirebaseGoogleAnalytics
+
+  iOS -.->|REST API| LMSBackendAPI
+  iOS <-.->|Push| FirebaseMessaging
+  iOS -->|Analytics| FirebaseGoogleAnalytics
+
+  %% Backend connections
+  LMSBackendAPI <-.->|SQL| LMSDatabase
+  LMSBackendAPI <-.->|Cache| LMSDatabaseCache
+  LMSBackendAPI <-.->|Files| LMSFileStorage
+  LMSBackendAPI -->|Metrics| AmazonCloudWatch
+  LMSBackendAPI -->|Errors| Sentry
+  LMSBackendAPI -->|Alerts| Slack
+  LMSBackendAPI -->|Commands| FirebaseMessaging
+
+  %% Monitoring flows
+  FirebaseGoogleAnalytics -->|Data Export| BigQuery
+  FirebaseGoogleAnalytics -->|Alerts| Slack
+
+  AmazonCloudWatch -->|Alerts| Slack
+
+  BigQuery <-.->|Queries| Grafana
+  Sentry -->|Error Alerts| Slack
+  Grafana <-.->|Error Metrics| Sentry
+
+  %% Styling
+  classDef userDevice fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#0d47a1
+  classDef frontend fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#4a148c
+  classDef backend fill:#e8f5e8,stroke:#388e3c,stroke-width:3px,color:#1b5e20
+  classDef storage fill:#fff3e0,stroke:#f57c00,stroke-width:3px,color:#e65100
+  classDef messaging fill:#fce4ec,stroke:#c2185b,stroke-width:3px,color:#880e4f
+  classDef analytics fill:#e0f2f1,stroke:#00695c,stroke-width:3px,color:#004d40
+  classDef infrastructure fill:#ffebee,stroke:#d32f2f,stroke-width:3px,color:#b71c1c
+  classDef visualization fill:#e8eaf6,stroke:#3f51b5,stroke-width:3px,color:#1a237e
+  classDef communication fill:#f1f8e9,stroke:#689f38,stroke-width:3px,color:#33691e
+  
     class Desktop,Browser,Android,iOS userDevice
-    class Frontend,Backend,Firebase lmsPlatform
-    class LMSDB,Cache,Storage database
-    class Analytics,BigQuery,Grafana,CloudWatch,Sentry,Slack monitoring</pre>
+  class LMSFrontend frontend
+  class LMSBackendAPI backend
+  class LMSDatabase,LMSDatabaseCache,LMSFileStorage storage
+  class FirebaseMessaging messaging
+  class FirebaseGoogleAnalytics,BigQuery analytics
+  class AmazonCloudWatch,Sentry infrastructure
+  class Grafana visualization
+  class Slack communication
+
+  %% Group styling
+  classDef groupStyle fill:#f9f9f9,stroke:#666,stroke-width:2px,stroke-dasharray: 5 5</pre>
         </div>
       </section>
 
       <section id="flows" class="panel">
         <h2>Потоки данных</h2>
-        <h3>Основные пользовательские сценарии</h3>
+        
+        <h3>Пользовательские данные</h3>
+        <p>Регистрация и аутентификация проходят следующий путь:</p>
         <ol>
-          <li><strong>Аутентификация пользователя</strong>: Клиент → LMS Backend API → LMS Database</li>
-          <li><strong>Загрузка образовательного контента</strong>: Клиент → LMS Backend API → Amazon S3</li>
-          <li><strong>Кэширование данных</strong>: LMS Backend API → DynamoDB → Клиент</li>
-          <li><strong>Push‑уведомления</strong>: LMS Backend API → Firebase Cloud Messaging → Клиенты</li>
+          <li>Клиентское приложение отправляет учетные данные в <strong>Laravel API</strong></li>
+          <li>API проверяет данные в <strong>MySQL</strong> через <strong>Eloquent ORM</strong></li>
+          <li>Система генерирует JWT-токен и кеширует сессию в <strong>DynamoDB</strong></li>
+          <li>Токен возвращается клиенту для последующих запросов</li>
         </ol>
-        <h3>Мониторинг и аналитика</h3>
+
+        <h3>Контент курсов</h3>
+        <p>Загрузка обучающих материалов:</p>
         <ol>
-          <li><strong>Пользовательские события</strong>: Клиенты → Firebase Analytics → BigQuery</li>
-          <li><strong>Системные метрики</strong>: AWS сервисы → CloudWatch → Grafana</li>
-          <li><strong>Ошибки приложения</strong>: Backend/Frontend → Sentry → Slack</li>
+          <li>Администратор загружает файлы через веб-интерфейс <strong>Quasar Frontend</strong></li>
+          <li>Frontend передает файлы в <strong>Laravel API</strong></li>
+          <li>API сохраняет метаданные в <strong>MySQL</strong> и загружает файлы в <strong>S3</strong></li>
+          <li>Система обновляет кеш в <strong>DynamoDB</strong> для быстрого доступа</li>
+          <li><strong>CloudFront CDN</strong> обеспечивает быструю доставку файлов пользователям</li>
+        </ol>
+
+        <h3>Аналитические данные</h3>
+        <p>Сбор пользовательской активности:</p>
+        <ol>
+          <li>Клиентские приложения отправляют события в <strong>Firebase Analytics</strong> и <strong>Google Analytics</strong></li>
+          <li><strong>Firebase</strong> передает данные в <strong>BigQuery</strong> через автоматический экспорт</li>
+          <li><strong>Google Analytics</strong> также синхронизирует данные с <strong>BigQuery</strong></li>
+          <li><strong>Grafana</strong> выполняет SQL-запросы к <strong>BigQuery</strong> для построения графиков</li>
+          <li>Критические изменения метрик вызывают алерты в <strong>Slack</strong></li>
+        </ol>
+
+        <h3>Уведомления</h3>
+        <p>Отправка push-уведомлений:</p>
+        <ol>
+          <li><strong>Laravel API</strong> генерирует уведомление на основе пользовательских действий</li>
+          <li>API отправляет запрос в <strong>Firebase Cloud Messaging</strong> с device tokens</li>
+          <li><strong>FCM</strong> доставляет уведомления на <strong>Android</strong> и <strong>iOS</strong> устройства</li>
+          <li>Мобильные приложения отображают уведомления пользователям</li>
+          <li>Статистика доставки передается обратно в <strong>Firebase Analytics</strong></li>
+        </ol>
+
+        <h3>Мониторинг и алертинг</h3>
+        <p>Обработка ошибок и мониторинг:</p>
+        <ol>
+          <li>Приложения отправляют ошибки в <strong>Sentry</strong> в реальном времени</li>
+          <li><strong>AWS CloudWatch</strong> собирает метрики инфраструктуры каждую минуту</li>
+          <li>При превышении пороговых значений системы отправляют алерты в <strong>Slack</strong></li>
+          <li><strong>Grafana</strong> подключается к <strong>Sentry API</strong> для отображения графиков ошибок</li>
+          <li>Команда получает централизованные уведомления в <strong>Slack</strong> для быстрого реагирования</li>
+        </ol>
+
+        <h3>Резервное копирование</h3>
+        <p>Обеспечение сохранности данных:</p>
+        <ol>
+          <li><strong>Amazon RDS</strong> автоматически создает ежедневные бэкапы <strong>MySQL</strong></li>
+          <li><strong>S3</strong> реплицирует файлы в другие регионы AWS</li>
+          <li><strong>DynamoDB</strong> создает point-in-time восстановление</li>
+          <li>Критические данные дублируются через cross-region backup</li>
+          <li>Процедуры восстановления тестируются еженедельно</li>
         </ol>
       </section>
 
       <section id="client" class="panel">
-        <h2>Клиентский уровень (Presentation Layer)</h2>
-        <h3>Пользовательские устройства</h3>
-        <p>Платформа поддерживает четыре основных типа клиентских устройств:</p>
-        <table>
-          <thead>
-            <tr><th>Устройство</th><th>Фреймворк</th><th>Язык</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Desktop / Browser</td><td>Quasar Framework</td><td>TypeScript</td></tr>
-            <tr><td>Android</td><td>Native</td><td>Kotlin</td></tr>
-            <tr><td>iOS</td><td>Native</td><td>Swift</td></tr>
-          </tbody>
-        </table>
-        <h3>Frontend архитектура</h3>
-        <ul>
-          <li>Единая кодовая база для веб и мобильных приложений</li>
-          <li>Типобезопасность и улучшенная поддержка разработки</li>
-          <li>Компонентно‑ориентированная архитектура</li>
-          <li>Адаптивный дизайн для различных устройств</li>
-        </ul>
+        <h2>Клиентский уровень</h2>
+        
+        <h3>Веб-приложения</h3>
+        <p><strong>Десктопное веб-приложение</strong> работает в современных браузерах и предоставляет полный функционал платформы. Приложение использует современные веб-стандарты: HTML5, CSS3 и JavaScript ES6+. Интерфейс адаптируется под различные размеры экранов через адаптивную верстку.</p>
+        
+        <p><strong>Мобильное веб-приложение</strong> оптимизировано для сенсорного управления на смартфонах и планшетах. Приложение использует Progressive Web App (PWA) технологии для работы в офлайн-режиме и быстрой загрузки контента.</p>
+
+        <h3>Мобильные приложения</h3>
+        <p><strong>Android-приложение</strong> разработано на нативной платформе с использованием Java или Kotlin. Приложение интегрировано с сервисами Google Play для автоматических обновлений и распространения. Поддерживается работа с различными версиями Android API.</p>
+        
+        <p><strong>iOS-приложение</strong> создано с использованием Swift и интегрировано с экосистемой Apple. Приложение соответствует Human Interface Guidelines и поддерживает функции iOS, такие как Spotlight Search и Siri Shortcuts.</p>
       </section>
 
       <section id="server" class="panel">
-        <h2>Серверный уровень (Application Layer)</h2>
-        <h3>Backend API</h3>
+        <h2>Серверный уровень</h2>
+        
+        <h3>Фронтенд-сервис</h3>
+        <p><strong>Quasar Framework</strong> — это Vue.js-based фреймворк для создания кроссплатформенных приложений. Фреймворк использует компонентный подход и реактивную архитектуру данных. Встроенная система сборки оптимизирует код для продакшена и обеспечивает быструю загрузку страниц.</p>
+        
+        <p>Ключевые возможности <strong>Quasar</strong>:</p>
         <ul>
-          <li>RESTful API для взаимодействия с клиентскими приложениями</li>
-          <li>Аутентификация и авторизация пользователей</li>
-          <li>Бизнес‑логика управления образовательным процессом</li>
-          <li>Интеграции с внешними сервисами</li>
+          <li>Автоматическая генерация адаптивной сетки</li>
+          <li>Встроенные UI-компоненты в стиле Material Design</li>
+          <li>Поддержка Server-Side Rendering (SSR) для улучшения SEO</li>
+          <li>Hot Module Replacement для быстрой разработки</li>
         </ul>
-        <h3>Система уведомлений</h3>
+
+        <h3>Бэкенд API</h3>
+        <p><strong>Laravel Framework</strong> — это PHP-фреймворк, который следует архитектурному паттерну Model-View-Controller (MVC). Фреймворк предоставляет встроенный ORM Eloquent для работы с базами данных и систему миграций для версионирования схемы данных.</p>
+        
+        <p>Основные компоненты <strong>Laravel</strong>:</p>
         <ul>
-          <li>Кроссплатформенные push‑уведомления</li>
-          <li>Мгновенная доставка сообщений</li>
-          <li>Персонализация уведомлений по событиям</li>
+          <li>Blade-шаблонизатор для генерации представлений</li>
+          <li>Artisan CLI для автоматизации задач разработки</li>
+          <li>Встроенная система аутентификации и авторизации</li>
+          <li>Queue система для обработки фоновых задач</li>
+          <li>Cache система с поддержкой различных драйверов</li>
         </ul>
       </section>
 
       <section id="data" class="panel">
-        <h2>Уровень данных (Data Layer)</h2>
-        <h3>Основная база данных</h3>
+        <h2>Уровень данных</h2>
+        
+        <h3>Реляционная база данных</h3>
+        <p><strong>Amazon RDS</strong> с <strong>MySQL Community Edition</strong> обеспечивает надежное хранение структурированных данных. Сервис автоматически создает резервные копии, выполняет обновления и масштабирование. MySQL настроен с репликацией master-slave для повышения производительности чтения.</p>
+        
+        <p>Конфигурация базы данных:</p>
         <ul>
-          <li>Amazon RDS MySQL — реляционная модель, резервное копирование</li>
-          <li>Масштабирование через read replicas, высокая доступность</li>
+          <li>InnoDB storage engine для ACID-совместимости</li>
+          <li>UTF-8 кодировка для поддержки международных символов</li>
+          <li>Индексирование критических полей для быстрого поиска</li>
+          <li>Партиционирование больших таблиц по датам</li>
         </ul>
-        <h3>Система кэширования</h3>
+
+        <h3>Кеш-система</h3>
+        <p><strong>Amazon DynamoDB</strong> работает как NoSQL-хранилище для кеширования. База данных обеспечивает консистентную производительность с малой задержкой. Настроена автомасштабируемость для обработки пиковых нагрузок.</p>
+        
+        <p>Структура кеша:</p>
         <ul>
-          <li>Amazon DynamoDB — быстрый доступ, авто‑масштабирование</li>
+          <li>TTL (Time To Live) для автоматического удаления устаревших записей</li>
+          <li>Global Secondary Indexes для эффективных запросов</li>
+          <li>Point-in-time recovery для восстановления данных</li>
         </ul>
+
         <h3>Файловое хранилище</h3>
+        <p><strong>Amazon S3</strong> хранит статические файлы с высокой доступностью. Настроена интеграция с CloudFront CDN для быстрой доставки контента пользователям по всему миру. Файлы организованы в bucket'ы с настроенной политикой доступа.</p>
+        
+        <p>Организация хранилища:</p>
         <ul>
-          <li>Amazon S3 — контент, CDN, версионирование, права доступа</li>
+          <li>Versioning для отслеживания изменений файлов</li>
+          <li>Lifecycle policies для автоматического перемещения данных в более дешевые storage классы</li>
+          <li>Cross-region replication для обеспечения отказоустойчивости</li>
+        </ul>
+      </section>
+
+      <section id="notifications" class="panel">
+        <h2>Система уведомлений</h2>
+        <p><strong>Firebase Cloud Messaging (FCM)</strong> — это cross-platform решение для отправки уведомлений. Сервис поддерживает как простые текстовые сообщения, так и rich-уведомления с изображениями и действиями.</p>
+        
+        <p>Функциональность FCM:</p>
+        <ul>
+          <li>Topic messaging для рассылки группам пользователей</li>
+          <li>Device group messaging для синхронизации между устройствами одного пользователя</li>
+          <li>Analytics для отслеживания доставляемости уведомлений</li>
         </ul>
       </section>
 
       <section id="monitoring" class="panel">
-        <h2>Система мониторинга и аналитики</h2>
-        <h3>Аналитика пользовательского поведения</h3>
-        <p>Firebase и Google Analytics — трекинг, аналитика обучения, вовлеченность.</p>
-        <h3>Big Data аналитика</h3>
-        <p>BigQuery — складирование данных и SQL‑анализ.</p>
-        <h3>Визуализация метрик</h3>
-        <p>Grafana — дашборды и алерты.</p>
-        <h3>Инфраструктурный мониторинг</h3>
-        <p>Amazon CloudWatch — метрики и логи, уведомления.</p>
-        <h3>Error tracking</h3>
-        <p>Sentry — ошибки в реальном времени с подробными стеками.</p>
-        <h3>Система уведомлений</h3>
-        <p>Slack — централизованные уведомления и интеграции.</p>
+        <h2>Мониторинг и аналитика</h2>
+        
+        <h3>Мониторинг инфраструктуры</h3>
+        <p><strong>Amazon CloudWatch</strong> собирает метрики производительности из всех AWS-сервисов. Система настроена с custom metrics для отслеживания бизнес-показателей приложения. CloudWatch Alarms автоматически уведомляют команду о превышении пороговых значений.</p>
+        
+        <p>Отслеживаемые метрики:</p>
+        <ul>
+          <li>CPU и memory utilization серверов</li>
+          <li>Database connection pool utilization</li>
+          <li>API response time и error rate</li>
+          <li>Storage usage и transfer rates</li>
+        </ul>
+
+        <h3>Мониторинг ошибок</h3>
+        <p><strong>Sentry</strong> — это система мониторинга ошибок реального времени. Сервис автоматически группирует похожие ошибки и предоставляет stack trace с контекстной информацией. Настроена интеграция с системой контроля версий для отслеживания регрессий.</p>
+        
+        <p>Возможности Sentry:</p>
+        <ul>
+          <li>Release tracking для связи ошибок с версиями кода</li>
+          <li>Performance monitoring для выявления медленных транзакций</li>
+          <li>User feedback для сбора отзывов о проблемах</li>
+        </ul>
+
+        <h3>Веб-аналитика</h3>
+        <p><strong>Google Analytics</strong> отслеживает поведение пользователей на веб-платформе. Настроены цели конверсии и e-commerce tracking для измерения эффективности обучающих программ.</p>
+        
+        <p><strong>Firebase Analytics</strong> собирает данные из мобильных приложений. Система автоматически отслеживает стандартные события и поддерживает custom events для специфичных бизнес-метрик.</p>
+
+        <h3>Визуализация данных</h3>
+        <p><strong>Grafana</strong> создает интерактивные дашборды на основе данных из <strong>BigQuery</strong>. Настроены алерты для критических показателей с отправкой уведомлений в <strong>Slack</strong>.</p>
+        
+        <p><strong>BigQuery</strong> — это cloud data warehouse для анализа больших объемов данных. Система оптимизирована для аналитических запросов и поддерживает SQL-подобный синтаксис.</p>
       </section>
 
       <section id="stack" class="panel">
         <h2>Технологический стек</h2>
+        <p>Такая архитектура обеспечивает высокую доступность, масштабируемость и надежность платформы обучения при сохранении производительности для всех типов пользователей.</p>
+        
         <table>
           <thead><tr><th>Компонент</th><th>Технология</th><th>Язык программирования</th></tr></thead>
           <tbody>
-            <tr><td>Frontend Web</td><td>Quasar Framework</td><td>TypeScript</td></tr>
+            <tr><td>Frontend Web</td><td>Quasar Framework (Vue.js)</td><td>JavaScript ES6+</td></tr>
             <tr><td>Backend API</td><td>Laravel Framework</td><td>PHP</td></tr>
-            <tr><td>iOS App</td><td>Native</td><td>Swift</td></tr>
-            <tr><td>Android App</td><td>Native</td><td>Kotlin</td></tr>
+            <tr><td>iOS App</td><td>Native iOS</td><td>Swift</td></tr>
+            <tr><td>Android App</td><td>Native Android</td><td>Java/Kotlin</td></tr>
             <tr><td>База данных</td><td>Amazon RDS MySQL</td><td>SQL</td></tr>
             <tr><td>Кэш</td><td>Amazon DynamoDB</td><td>NoSQL</td></tr>
-            <tr><td>Файловое хранилище</td><td>Amazon S3</td><td>—</td></tr>
+            <tr><td>Файловое хранилище</td><td>Amazon S3 + CloudFront</td><td>—</td></tr>
             <tr><td>Push уведомления</td><td>Firebase Cloud Messaging</td><td>—</td></tr>
+            <tr><td>Мониторинг</td><td>Amazon CloudWatch</td><td>—</td></tr>
+            <tr><td>Error Tracking</td><td>Sentry</td><td>—</td></tr>
+            <tr><td>Аналитика</td><td>Firebase Analytics + Google Analytics</td><td>—</td></tr>
+            <tr><td>Data Warehouse</td><td>BigQuery</td><td>SQL</td></tr>
+            <tr><td>Визуализация</td><td>Grafana</td><td>—</td></tr>
+            <tr><td>Уведомления команды</td><td>Slack</td><td>—</td></tr>
           </tbody>
         </table>
       </section>

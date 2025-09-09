@@ -1,19 +1,110 @@
-/* Дополнительные стили для улучшения читаемости */
-:root{scroll-behavior:smooth}
-/* Правильное позиционирование якорей */
+/* Confluence-style additional styles */
+
+/* Smooth scrolling */
+:root {
+  scroll-behavior: smooth;
+}
+
+/* Proper anchor positioning */
 section[id] {
   scroll-margin-top: 100px;
 }
-main .muted{color:var(--muted)}
-article h3{margin-top:0}
-.panel ul{margin:0 0 0 1rem}
-.panel li{margin:4px 0}
-/* Левое дерево разделов */
-#toc{position:sticky;top:72px;max-height:calc(100vh - 120px);overflow-y:auto;transition:all 0.3s ease}
-#toc nav a{color:var(--fg);text-decoration:none;display:block;padding:4px 0;font-size:14px;transition:all 0.2s ease;border-radius:4px}
-#toc nav a:hover{text-decoration:underline;color:var(--accent);background:rgba(124,58,237,0.1);padding-left:8px}
-#toc nav a.active{color:var(--accent);background:rgba(124,58,237,0.15);padding-left:8px;font-weight:600}
-#toc h2{margin:0 0 12px;font-size:16px}
-#toc ul{margin:0;padding:0;list-style:none}
-#toc li{margin:2px 0}
+
+/* Typography improvements */
+.panel strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.panel h2:first-child {
+  margin-top: 0;
+}
+
+.panel h3:first-child {
+  margin-top: 0;
+}
+
+/* Enhanced list styling */
+.panel ul {
+  margin: 0 0 16px 0;
+  padding-left: 20px;
+}
+
+.panel ol {
+  margin: 0 0 16px 0;
+  padding-left: 20px;
+}
+
+.panel li {
+  margin: 6px 0;
+  line-height: 1.5;
+}
+
+/* Enhanced table styling */
+.panel table {
+  margin: 20px 0;
+}
+
+.panel table th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.panel table td {
+  font-size: 14px;
+}
+
+/* Code block improvements */
+.panel pre {
+  margin: 20px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.panel code {
+  font-size: 13px;
+}
+
+/* Diagram container improvements */
+.panel .diagram {
+  margin: 20px 0;
+}
+
+/* Enhanced spacing for better readability */
+.panel > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Improved focus states for accessibility */
+#toc nav a:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* Better mobile experience */
+@media (max-width: 1024px) {
+  #toc {
+    position: static;
+    max-height: none;
+    margin-bottom: 24px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  
+  #toc {
+    display: none;
+  }
+  
+  .panel {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}
 
